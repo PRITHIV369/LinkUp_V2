@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const ProfileDetails = () => {
   const { profileId } = useParams();
   const [profile, setProfile] = useState(null);
   const [isSending, setIsSending] = useState(false);
-  const [useremail,setEmail]=useState('');
+  const [useremail, setEmail] = useState("");
+
   useEffect(() => {
-      const storedUserEmail = localStorage.getItem("useremail");
-      if (storedUserEmail) {
-        setEmail(storedUserEmail);
-      } else {
-        console.error("User Email not found");
-      }
-    }, []);
+    const storedUserEmail = localStorage.getItem("useremail");
+    if (storedUserEmail) {
+      setEmail(storedUserEmail);
+    } else {
+      console.error("User Email not found");
+    }
+  }, []);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`https://linkup-nd81.onrender.com/api/profile/${profileId}`);
-        const data = await response.json();
-        setProfile(data);
+        const response = await axios.get(`https://linkup-nd81.onrender.com/api/profile/${profileId}`);
+        setProfile(response.data);
       } catch (error) {
         console.error("Error fetching profile details:", error);
       }
@@ -33,19 +35,13 @@ const ProfileDetails = () => {
 
     setIsSending(true);
     try {
-      const response = await fetch("https://linkup-nd81.onrender.com/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: profile.email,
-          subject: "Someone checked out your profile",
-          message: `The admin has notified you that ${profileId} checked out your profile.`,
-        }),
-      });0
+      const response = await axios.post("https://linkup-nd81.onrender.com/api/send-email", {
+        to: profile.email,
+        subject: "Someone viewed your profile!",
+        message: `Hey ${profile.name},\n\n${useremail} just checked out your profile on LinkUp. Feel free to connect!\n\nCheers,\nLinkUp Team`,
+      });
 
-      if (response.ok) {
+      if (response.status === 200) {
         alert("Email sent successfully!");
       } else {
         alert("Failed to send email. Please try again.");
@@ -73,7 +69,7 @@ const ProfileDetails = () => {
       <div className="w-full max-w-3xl bg-slate-700 shadow-lg rounded-xl p-6 sm:p-8 lg:p-10 text-slate-200">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 border-b border-slate-600 pb-6">
           <img
-            src={profile.profilePic ? profile.profilePic : "/default-avatar.jpg"}
+            src={profile.profilePic || "/default-avatar.jpg"}
             alt={`${profile.name}'s profile`}
             className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-slate-600 shadow-md"
           />
@@ -82,11 +78,9 @@ const ProfileDetails = () => {
             <p className="text-sm sm:text-base text-slate-400 mt-2">
               {profile.personality || "No personality info"}
             </p>
-            {/* <p className="text-sm sm:text-base text-blue-400 mt-2">
-              {profile.email || "Email not available"}
-            </p> */}
           </div>
         </div>
+
         <div className="mt-6 space-y-4 sm:space-y-6">
           <div>
             <h2 className="text-lg font-semibold text-slate-300">Bio</h2>
@@ -97,17 +91,17 @@ const ProfileDetails = () => {
           <div>
             <h2 className="text-lg font-semibold text-slate-300">Interests</h2>
             <p className="text-slate-400 mt-2 text-sm sm:text-base">
-              {profile.interests && profile.interests.length > 0
-                ? profile.interests.join(", ")
-                : "No interests listed"}
+              {profile.interests?.length ? profile.interests.join(", ") : "No interests listed"}
             </p>
           </div>
         </div>
+
         <div className="mt-6 border-t border-slate-600 pt-4 text-center">
           <p className="text-sm text-slate-500">
-            Profile created on: {profile.updatedAt || "Not available"}
+            Profile last updated: {new Date(profile.updatedAt).toLocaleDateString()}
           </p>
         </div>
+
         <div className="mt-4 flex justify-center">
           <button
             onClick={handleEmailSend}

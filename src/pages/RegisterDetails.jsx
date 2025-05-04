@@ -53,7 +53,7 @@ const RegisterDetails = () => {
     if (profilePic) data.append("profilePic", profilePic);
 
     try {
-      await axios.post("http://localhost:4000/createUser", data, {
+      await axios.post("https://linkup-nd81.onrender.com/createUser", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       navigate("/login");

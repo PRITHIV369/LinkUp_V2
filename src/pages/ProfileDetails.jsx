@@ -17,7 +17,7 @@ const ProfileDetails = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/profile/${profileId}`);
+        const response = await fetch(`https://linkup-nd81.onrender.com/api/profile/${profileId}`);
         const data = await response.json();
         setProfile(data);
       } catch (error) {
@@ -33,7 +33,7 @@ const ProfileDetails = () => {
 
     setIsSending(true);
     try {
-      const response = await fetch("http://localhost:4000/api/send-email", {
+      const response = await fetch("https://linkup-nd81.onrender.com/api/send-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const ProfileDetails = () => {
           subject: "Someone checked out your profile",
           message: `The admin has notified you that ${profileId} checked out your profile.`,
         }),
-      });
+      });0
 
       if (response.ok) {
         alert("Email sent successfully!");

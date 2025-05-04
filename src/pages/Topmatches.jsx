@@ -162,7 +162,7 @@ const Topmatches = () => {
     if (userId) {
       const fetchProfiles = async () => {
         try {
-          const response = await fetch("http://localhost:4000/api/top-profiles", {
+          const response = await fetch("https://linkup-nd81.onrender.com/api/top-profiles", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId }),
